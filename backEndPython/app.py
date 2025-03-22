@@ -13,7 +13,11 @@ collection = db.pokemonLista2
 @app.route("/pokemon/<nombre>", methods=["GET"])
 def get_pokemon_by_name(nombre):
     try:
-        pokemon = collection.find_one({"nombrePokemon": nombre}, {"_id": 0})
+        # Hacer búsqueda insensible a mayúsculas y minúsculas
+        pokemon = collection.find_one(
+            {"nombrePokemon": {"$regex": f"^{nombre}$", "$options": "i"}},
+            {"_id": 0}
+        )
         if pokemon:
             return jsonify(pokemon), 200
         else:
@@ -22,7 +26,7 @@ def get_pokemon_by_name(nombre):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ✅ Nueva ruta para devolver la lista de Pokémon cuando se solicita `/pokemon/list`
+# ✅ Ruta adicional para obtener todos los Pokémon
 @app.route("/pokemon/list", methods=["GET"])
 def get_all_pokemon():
     try:
